@@ -81,6 +81,86 @@ function rotatePipe(tile) {
     currentRotation = (currentRotation + 90) % 360;
     tile.dataset.rotation = currentRotation;
     tile.style.transform = `rotate(${currentRotation}deg)`;
+    checkConnection();
+}
+
+function checkConnection() {
+    const rows = Math.max(...tiles.map(t => parseInt(t.dataset.r))) + 1;
+    const cols = Math.max(...tiles.map(t => parseInt(t.dataset.c))) + 1;
+
+    const gridData = Array.from({ length: rows }, () => Array(cols).fill(null));
+    tiles.forEach(tile => {
+        const r = parseInt(tile.dataset.r);
+        const c = parseInt(tile.dataset.c);
+        gridData[r][c] = {
+            type: tile.dataset.type,
+            shape: tile.dataset.pipeShape || '',
+            rotation: parseInt(tile.dataset.rotation) || 0
+        };
+    });
+
+    const start = { r: startPos.r, c: startPos.c };
+    const end = { r: endPos.r, c: endPos.c };
+    const visited = new Set();
+    let success = false;
+
+    function dfs(r, c) {
+        if (r === end.r && c === end.c) {
+            success = true;
+            return;
+        }
+        visited.add(`${r},${c}`);
+        const cell = gridData[r][c];
+        if (!cell) return;
+
+        const neighbors = getConnections(cell, r, c);
+        neighbors.forEach(([nr, nc]) => {
+            if (
+                nr >= 0 && nr < rows &&
+                nc >= 0 && nc < cols &&
+                !visited.has(`${nr},${nc}`) &&
+                isConnected(gridData[nr][nc], nr, nc, r, c)
+            ) {
+                dfs(nr, nc);
+            }
+        });
+    }
+
+    dfs(start.r, start.c);
+
+    if (success) {
+        closeGame(true);
+    }
+}
+
+function getConnections(cell, r, c) {
+    if (cell.type === 'start') return [[r, c + 1], [r + 1, c]];
+    if (cell.type === 'end') return [[r, c - 1], [r - 1, c]];
+
+    if (cell.type !== 'pipe') return [];
+
+    let conns = [];
+    if (cell.shape === 'straight') {
+        if (cell.rotation % 180 === 0) { // horizontal
+            conns.push([r, c - 1], [r, c + 1]);
+        } else { // vertical
+            conns.push([r - 1, c], [r + 1, c]);
+        }
+    } else if (cell.shape === 'L') {
+        if (cell.rotation === 0) conns.push([r, c - 1], [r - 1, c]);
+        if (cell.rotation === 90) conns.push([r - 1, c], [r, c + 1]);
+        if (cell.rotation === 180) conns.push([r, c + 1], [r + 1, c]);
+        if (cell.rotation === 270) conns.push([r + 1, c], [r, c - 1]);
+    }
+    return conns;
+}
+
+function isConnected(cell, r, c, fromR, fromC) {
+    if (!cell) return false;
+    if (cell.type === 'start' || cell.type === 'end') return true;
+
+    const conns = getConnections(cell, r, c);
+    return conns.some(([nr, nc]) => nr === fromR && nc === fromC);
 }
 
 function closeGame(success) {
