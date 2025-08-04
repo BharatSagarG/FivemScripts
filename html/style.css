@@ -1,0 +1,102 @@
+/* Overlay full screen */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+/* Timer */
+#timer {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 30px;
+    font-weight: bold;
+    text-shadow: 0 0 12px #0f0;
+}
+
+/* Grid container */
+#grid-container {
+    padding: 20px;
+    background: rgba(20, 20, 20, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0, 255, 150, 0.5);
+}
+
+/* Grid layout */
+#grid {
+    display: grid;
+    gap: 6px;
+}
+
+/* Tile */
+.tile {
+    width: 64px;
+    height: 64px;
+    background: #111;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Start tile */
+.start-tile {
+    background: limegreen !important;
+}
+
+/* End tile */
+.end-tile {
+    background: red !important;
+}
+
+/* Pipe straight */
+.pipe-straight {
+    background-color: transparent !important;
+    position: relative;
+}
+.pipe-straight::before {
+    content: '';
+    position: absolute;
+    top: 45%;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: white;
+    border-radius: 3px;
+}
+
+/* Pipe L shape */
+.pipe-L {
+    background-color: transparent !important;
+    position: relative;
+}
+.pipe-L::before,
+.pipe-L::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 3px;
+}
+.pipe-L::before {
+    top: 45%;
+    left: 0;
+    width: 50%;
+    height: 10px;
+}
+.pipe-L::after {
+    left: 45%;
+    top: 0;
+    width: 10px;
+    height: 50%;
+}
